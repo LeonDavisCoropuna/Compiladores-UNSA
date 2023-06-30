@@ -1,0 +1,14 @@
+/*
+if(a < 10){
+    return 1;
+}
+int f = 23 + 8
+*/
+int main(){
+    int b = 10 - 4
+//    int x = 15 + b
+    if ( 10 == 3 ) {
+        return 0;
+    }
+}
+
