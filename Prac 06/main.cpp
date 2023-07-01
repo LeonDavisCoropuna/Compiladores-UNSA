@@ -30,20 +30,19 @@ public:
     bool aceptacion = 0; //si es estado final
     vector<Arista *> salidas; //aristas
     //busca las transicion epsilon
-    void buscar(int s, set<Nodo *> &pila) 
+    void buscar(int s, set<Nodo *> &subconjunto) 
     {
         for (auto i : salidas)
         {
             if (i->caracter_destino == s)
             {
-                pila.insert(i->destino);
-                i->destino->buscar(s, pila);
+                subconjunto.insert(i->destino);
+                i->destino->buscar(s, subconjunto);
             }
         }
     }
-    void E_claus(int s, set<Nodo *>&pila){
-        //pila.insert(this);
-        buscar(s,pila);
+    void E_claus(int s, set<Nodo *>&subconjunto){
+        buscar(s,subconjunto);
     }
     //aristas de un nodo
     void findSalidas(int s, set<Nodo *>&pila){
@@ -204,7 +203,7 @@ class AFD{
 };
 
 void TranformarAFD_AFN(AFN &afn,AFD &afd){
-    //se inicializa el afd con el estado inicial
+    //se inicializa el afd con la clausura de del estado 0
     set<Nodo *> temp3;
     temp3.insert(afn.nodos[0]);
     NodoAFD *q = new NodoAFD;
@@ -212,15 +211,16 @@ void TranformarAFD_AFN(AFN &afn,AFD &afd){
     q->lista.insert(afn.nodos[0]);
     afn.nodos[0]->E_claus(-1,q->lista);
     afd.nodos.push_back(q);
-    int todoMarcado = 1;
+    int noMarcado = 1;
     //mientras todos los nodos no esten marcados entonces...
-    while(todoMarcado){
+    while(noMarcado){
         set<Nodo *> aux; //almacena las salidas desde un nodo
-        set<Nodo *> aux2; //almacena los elementos del nodoAFD
-        todoMarcado = 0;
+        set<Nodo *> aux2; //almacena los nodos del nodoAFD
+        noMarcado = 0;
         for(auto itnodos :afd.nodos){
+            //verifica si el nodo no esta marcado
             if(itnodos->marca == 0){
-                todoMarcado = 1;
+                noMarcado = 1;
                 for(auto itAlfabeto : afn.entradas){
                     for(auto itNodo : itnodos->lista){
                         itNodo->findSalidas(itAlfabeto,aux);
@@ -252,6 +252,7 @@ void TranformarAFD_AFN(AFN &afn,AFD &afd){
                     aux2.clear();
                 }
             }
+            //marca el nodo para no visitarlo nuevamente
             itnodos->marca = 1;
         }
     }
